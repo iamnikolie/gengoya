@@ -105,7 +105,7 @@ Video-only flags:
 | `--duration <n>` | model default | Veo takes `4\|6\|8`; Omni `3..10` (default 5) |
 | `--aspect <ratio>` | first declared (`16:9`) | Veo: `16:9\|9:16` (no square) |
 | `--person allow_all\|allow_adult` | (omit) | `personGeneration` (**Veo only**) |
-| `--edit <mp4\|id>` | (none) | **Omni only.** Edit/extend: a prior interaction id / `job_id` (stateful, verified) or a local mp4 ≤10 s (inline upload; **was blocked in our tests**, likely regional) |
+| `--edit <mp4\|id>` | (none) | **Omni only.** Edit/extend: a prior interaction id / `job_id` (stateful, verified) or a local mp4 ≤10 s (inline upload; **not available in the EEA, Switzerland or the UK** per Google's limitations — the API answers `content_blocked`; editing clips Omni generated works everywhere) |
 | `--delivery inline\|uri` | auto | **Omni only.** inline ≤720p, `files/` uri for 1080p/4k |
 | `--detach` | false | **Veo only.** Start the job, print the operation name, exit |
 | `--poll-interval <dur>` | `10s` | Operation poll cadence |

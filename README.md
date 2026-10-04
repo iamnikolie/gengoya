@@ -122,7 +122,7 @@ Every `video` call is stored server-side; edit a previous result by id:
 ```bash
 gengoya video "a violin player on a stage" --model omni-flash --resolution 360p --json  # note job_id
 gengoya video "make the violin invisible" --model omni-flash --resolution 360p --edit <job_id>
-gengoya video "make the mirror ripple" --model omni-flash --edit clip.mp4   # local <=10s mp4 (was rejected as content_blocked in our tests)
+gengoya video "make the mirror ripple" --model omni-flash --edit clip.mp4   # local <=10s mp4 — not available in the EEA, Switzerland or the UK (Google limitation)
 ```
 
 Omni is one blocking request (about 15-45 s). `--detach` is refused for it:

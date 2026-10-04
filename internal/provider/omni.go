@@ -358,6 +358,9 @@ func (o *Omni) Start(ctx context.Context, r VideoRequest) (string, error) {
 		if code := httpStatus(err); code >= 500 {
 			return "", fmt.Errorf("provider.Omni.Start: %w (not retried: the server may already have generated and billed the clip — check AI Studio usage before re-running)", err)
 		}
+		if len(r.EditVideo) > 0 && strings.Contains(err.Error(), "content_blocked") {
+			return "", fmt.Errorf("provider.Omni.Start: %w (editing uploaded videos is not available in the EEA, Switzerland or the UK; --edit <job_id> of a clip Omni generated works everywhere)", err)
+		}
 		return "", fmt.Errorf("provider.Omni.Start: %w", err)
 	}
 	op, err := ParseOmniInteraction(resp)
