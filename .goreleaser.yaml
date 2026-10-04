@@ -46,3 +46,28 @@ changelog:
 release:
   draft: false
   prerelease: auto
+
+# Formula in iamnikolie/homebrew-tap, rewritten on every tag. Needs the
+# HOMEBREW_TAP_TOKEN secret (fine-grained, contents:write on homebrew-tap only).
+brews:
+  - name: gengoya
+    repository:
+      owner: iamnikolie
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    commit_author:
+      name: Mykola Klitovchenko
+      email: mykola.klitovchenko@gmail.com
+    commit_msg_template: "{{ .ProjectName }} {{ .Version }}"
+    homepage: https://github.com/iamnikolie/gengoya
+    description: "Image, video, music and speech generation CLI for coding agents"
+    license: MIT
+    skip_upload: auto
+    caveats: |
+      Video poster frames (the PNG contact sheet next to each clip) need ffmpeg:
+      brew install ffmpeg
+    install: |
+      bin.install "gengoya"
+    test: |
+      assert_match(/^gengoya version /, shell_output("#{bin}/gengoya version"))
