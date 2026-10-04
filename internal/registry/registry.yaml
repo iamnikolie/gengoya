@@ -1,0 +1,298 @@
+# Model aliases → provider API ids. Edit to add/replace models; no rebuild needed
+# if you drop a registry.yaml into ~/.gengoya/<profile>/.
+# price_*_in/out are USD per 1M tokens for OpenAI usage-based cost (rough).
+# kind: video models are billed per output second: price_per_sec[resolution] in USD.
+defaults:
+  openai: gpt-image-2.5-flare
+  gemini: nano-banana-2
+
+# Default model for `gengoya video`, per provider.
+video_defaults:
+  gemini: veo-3.1-fast
+
+# Defaults for `gengoya music` and `gengoya speak`, per provider.
+music_defaults:
+  gemini: lyria-3.5
+speech_defaults:
+  gemini: gemini-3.8-flash-tts
+
+models:
+  # ---------- OpenAI (Image API: /v1/images/generations, /v1/images/edits) ----------
+  # Verified live 2026-09-16. The 2.5 pair (flare/sunburst) adds xhigh + max on
+  # top of low/medium/high; every earlier GPT Image model stops at high. Both 2.5
+  # models share one output-token table and one token price, so the same quality
+  # costs the same on either — they differ in latency and edit precision, not $.
+  # NB: the API's quality-enum error string still reads "low, medium, high, auto"
+  # on every model; it is stale, xhigh/max are accepted. Trust the docs table.
+  gpt-image-2.5-flare:
+    provider: openai
+    api_id: gpt-image-2.5-flare
+    ops: [generate, edit]
+    size_mode: flexible
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536, 2048x2048, 2048x1152, 3840x2160, 2160x3840]
+    qualities: [auto, low, medium, high, xhigh, max]
+    price_note: "fast flagship; 1K low $0.006 / med $0.013 / high $0.053 / xhigh $0.094 / max $0.211"
+    price_per_img: 0.053
+    price_text_in: 5.0
+    price_image_in: 8.0
+    price_image_out: 30.0
+  gpt-image-2.5-sunburst:
+    provider: openai
+    api_id: gpt-image-2.5-sunburst
+    ops: [generate, edit]
+    size_mode: flexible
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536, 2048x2048, 2048x1152, 3840x2160, 2160x3840]
+    qualities: [auto, low, medium, high, xhigh, max]
+    price_note: "top edit precision; same $/token as flare, slower"
+    price_per_img: 0.053
+    price_text_in: 5.0
+    price_image_in: 8.0
+    price_image_out: 30.0
+  gpt-image-2:
+    provider: openai
+    api_id: gpt-image-2
+    ops: [generate, edit]
+    size_mode: flexible
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536, 2048x2048, 2048x1152, 3840x2160, 2160x3840]
+    qualities: [auto, low, medium, high]
+    price_note: "prev flagship; 1K low $0.006 / med $0.053 / high $0.211"
+    price_per_img: 0.053
+    price_text_in: 5.0
+    price_image_in: 8.0
+    price_image_out: 30.0
+  gpt-image-1.5:
+    provider: openai
+    api_id: gpt-image-1.5
+    ops: [generate, edit]
+    size_mode: enum
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536]
+    qualities: [auto, low, medium, high]
+    price_note: "older flagship"
+    price_per_img: 0.04
+    price_text_in: 5.0
+    price_image_in: 8.0
+    price_image_out: 32.0
+  gpt-image-1:
+    provider: openai
+    api_id: gpt-image-1
+    ops: [generate, edit]
+    size_mode: enum
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536]
+    qualities: [auto, low, medium, high]
+    price_note: "older"
+    price_per_img: 0.04
+    price_text_in: 5.0
+    price_image_in: 10.0
+    price_image_out: 40.0
+  gpt-image-1-mini:
+    provider: openai
+    api_id: gpt-image-1-mini
+    ops: [generate, edit]
+    size_mode: enum
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536]
+    qualities: [auto, low, medium, high]
+    price_note: "cheap/fast"
+    price_per_img: 0.01
+    price_text_in: 2.0
+    price_image_in: 2.5
+    price_image_out: 8.0
+
+  # ---------- Gemini (Nano Banana; generateContent + imageConfig) ----------
+  # Verified live 2026-09-16 against ListModels: the Nano Banana 2 and Nano Banana
+  # Pro previews have gone GA, so the api_ids below dropped their -preview suffix.
+  # The -preview ids are still served, but they are the ones that get retired.
+  # price_per_img is the 1K rate; bigger image_sizes cost more (see price_note).
+  nano-banana-2:
+    provider: gemini
+    api_id: gemini-3.1-flash-image
+    ops: [generate, edit]
+    size_mode: gemini
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536, 2048x2048, 2048x1152, 3840x2160, 512, 1K, 2K, 4K]
+    image_sizes: [512, 1K, 2K, 4K]
+    aspect_ratios: ["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"]
+    qualities: []
+    price_note: "0.5K $0.045 / 1K $0.067 / 2K $0.101 / 4K $0.151 per img"
+    price_per_img: 0.067
+  nano-banana-pro:
+    provider: gemini
+    api_id: gemini-3-pro-image
+    ops: [generate, edit]
+    size_mode: gemini
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536, 2048x2048, 2048x1152, 3840x2160, 1K, 2K, 4K]
+    image_sizes: [1K, 2K, 4K]
+    aspect_ratios: ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
+    qualities: []
+    price_note: "premium; complex scenes/text/brand; 1K-2K $0.134 / 4K $0.24"
+    price_per_img: 0.134
+  nano-banana-2-lite:
+    provider: gemini
+    api_id: gemini-3.1-flash-lite-image
+    ops: [generate, edit]
+    size_mode: gemini
+    sizes: [auto, 1024x1024, 1536x1024, 1024x1536, 1K]
+    image_sizes: [1K]
+    aspect_ratios: ["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
+    qualities: []
+    price_note: "cheapest/fastest; 1K only, $0.0336 per img"
+    price_per_img: 0.0336
+  nano-banana:
+    provider: gemini
+    api_id: gemini-2.5-flash-image
+    ops: [generate, edit]
+    size_mode: gemini
+    sizes: [auto, 1024x1024, 1K]
+    image_sizes: [1K]
+    aspect_ratios: ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
+    qualities: []
+    price_note: "legacy"
+    price_per_img: 0.039
+
+  # ---------- Gemini video (Veo; :predictLongRunning + operation polling) ----------
+  # Verified live 2026-08-02: only the 3.1 family is served — veo-2 / veo-3 were
+  # shut down 2026-06-30. Audio is generated with the video at no extra charge.
+  # First entry of resolutions/durations is the default when the flag is omitted.
+  veo-3.1:
+    provider: gemini
+    kind: video
+    api_id: veo-3.1-generate-preview
+    ops: [video]
+    resolutions: [720p, 1080p, 4k]
+    durations: ["8", "6", "4"]
+    aspect_ratios: ["16:9", "9:16"]
+    duration_by_resolution:
+      1080p: "8"
+      4k: "8"
+    ref_requires_duration: "8"
+    max_ref_images: 3
+    price_note: "$0.40/s 720p+1080p, $0.60/s 4k; audio incl."
+    price_per_sec:
+      720p: 0.40
+      1080p: 0.40
+      4k: 0.60
+  veo-3.1-fast:
+    provider: gemini
+    kind: video
+    api_id: veo-3.1-fast-generate-preview
+    ops: [video]
+    resolutions: [720p, 1080p, 4k]
+    durations: ["8", "6", "4"]
+    aspect_ratios: ["16:9", "9:16"]
+    duration_by_resolution:
+      1080p: "8"
+      4k: "8"
+    ref_requires_duration: "8"
+    max_ref_images: 3
+    price_note: "$0.10/s 720p, $0.12/s 1080p, $0.30/s 4k; audio incl."
+    price_per_sec:
+      720p: 0.10
+      1080p: 0.12
+      4k: 0.30
+  veo-3.1-lite:
+    provider: gemini
+    kind: video
+    api_id: veo-3.1-lite-generate-preview
+    ops: [video]
+    resolutions: [720p, 1080p]
+    durations: ["8", "6", "4"]
+    aspect_ratios: ["16:9", "9:16"]
+    duration_by_resolution:
+      1080p: "8"
+    ref_requires_duration: "8"
+    max_ref_images: 3
+    price_note: "cheapest; $0.05/s 720p, $0.08/s 1080p; no 4k"
+    price_per_sec:
+      720p: 0.05
+      1080p: 0.08
+
+  # ---------- Gemini Omni (Interactions API, not predictLongRunning) ----------
+  # POST /v1beta/interactions; the clip comes back as base64 (or a files/ uri) in
+  # steps[]. Output is 3-10s (duration is settable as "<n>s", range verified
+  # live 2026-10-04) at 24fps with audio. Billed per token, $17.50/1M video out.
+  # Live usage 2026-10-04, video tokens per output second: 360p 1,931 (5,793/3s),
+  # 720p 5,792, 1080p 8,688 (26,064/3s) => $0.0338 / $0.1014 / $0.1520 per s.
+  # 4k was NOT run live (~$1): the price below is an unverified upper-bound guess.
+  # Per-call text/thinking tokens and input tokens add ~$0.01 on top; real cost
+  # is read from the response usage when available.
+  omni-flash:
+    provider: gemini
+    kind: video
+    api_id: gemini-omni-1.1-flash
+    ops: [video]
+    resolutions: ["720p", "360p", "1080p", "4k"]
+    durations: ["5", "3", "4", "6", "7", "8", "9", "10"]
+    aspect_ratios: ["16:9", "9:16"]
+    max_ref_images: 6
+    price_note: "$0.034/s 360p, $0.101/s 720p, $0.152/s 1080p, 4k unverified (~$0.40/s); 3-10s; edit via --edit"
+    price_per_sec:
+      360p: 0.0338
+      720p: 0.1014
+      1080p: 0.1520
+      4k: 0.40
+
+  # ---------- Gemini music (Lyria; generateContent, audio inlineData) ----------
+  # Verified live 2026-10-04. Billed per song, flat. Output is MP3 44.1 kHz stereo
+  # (the docs claim 48 kHz for the Clip/Pro previews; live clip = 44.1). No
+  # duration/negative/seed parameter exists: length and vocals are steered in the
+  # prompt. WAV is documented for 3.5 (generationConfig.responseFormat), but live
+  # "audio/wav" is a 400 and "AUDIO_WAV" is accepted yet still returns MP3 (same via
+  # Interactions), so formats stays [mp3] — add wav here only once it works.
+  lyria-3.5:
+    provider: gemini
+    kind: music
+    api_id: lyria-3.5
+    ops: [music]
+    formats: [mp3]
+    max_ref_images: 10
+    price_per_song: 0.08
+    price_note: "$0.08/song flat; full song ~1-2 min, GA; mp3 only (wav request ignored live); image-to-music up to 10"
+  lyria-3-clip-preview:
+    provider: gemini
+    kind: music
+    api_id: lyria-3-clip-preview
+    ops: [music]
+    formats: [mp3]
+    fixed_seconds: 30
+    max_ref_images: 10
+    price_per_song: 0.04
+    price_note: "$0.04/clip flat; always 30 s; cheapest, iterate prompts here first"
+  lyria-3-pro-preview:
+    provider: gemini
+    kind: music
+    api_id: lyria-3-pro-preview
+    ops: [music]
+    formats: [mp3]
+    max_ref_images: 10
+    price_per_song: 0.08
+    price_note: "$0.08/song flat; legacy full-song preview (superseded by lyria-3.5)"
+
+  # ---------- Gemini speech (TTS; generateContent, AUDIO modality) ----------
+  # Verified live 2026-10-04. Unary calls return a complete WAV (24 kHz mono
+  # s16le). Billed per token: the docs say 25 audio tokens/s, MEASURED ~32 (236 tok
+  # for 7.36 s, 66 for 2.04 s); usageMetadata reports the real counts.
+  # Introductory rates hold THROUGH 2026-12-31; from 2027-01-01 text in doubles to $1.00/1M and audio out doubles ($18.00 flash, $12.00 lite).
+  # Voices are free-form: the 30 prebuilt names below, Extended Voice Library ids
+  # (GET /v1beta/voices, e.g. ar-eg-advisor-11) or custom voice_... ids.
+  gemini-3.8-flash-tts:
+    provider: gemini
+    kind: speech
+    api_id: gemini-3.8-flash-tts
+    ops: [speak]
+    default_voice: Kore
+    max_speakers: 2
+    price_text_in: 0.50
+    price_audio_out: 9.00
+    audio_tokens_per_sec: 32
+    voices: &voices [Zephyr, Puck, Charon, Kore, Fenrir, Leda, Orus, Aoede, Callirrhoe, Autonoe, Enceladus, Iapetus, Umbriel, Algieba, Despina, Erinome, Algenib, Rasalgethi, Laomedeia, Achernar, Alnilam, Schedar, Gacrux, Pulcherrima, Achird, Zubenelgenubi, Vindemiatrix, Sadachbia, Sadaltager, Sulafat]
+    price_note: "flagship; 130 languages; $9.00/1M audio out (~$0.00225/10s) thru 2026-12-31, then $18"
+  gemini-3.8-flash-lite-tts:
+    provider: gemini
+    kind: speech
+    api_id: gemini-3.8-flash-lite-tts
+    ops: [speak]
+    default_voice: Kore
+    max_speakers: 2
+    price_text_in: 0.50
+    price_audio_out: 6.00
+    audio_tokens_per_sec: 32
+    voices: *voices
+    price_note: "cheap/fast; 101 languages; $6.00/1M audio out (~$0.0015/10s) thru 2026-12-31, then $12"
