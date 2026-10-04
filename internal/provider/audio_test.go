@@ -439,3 +439,9 @@ func TestClientErrorHasNoBilledWarning(t *testing.T) {
 	require.Error(t, err)
 	assert.NotContains(t, err.Error(), "billed")
 }
+
+func TestWrapPCMAsWAVClampsHeaderFields(t *testing.T) {
+	w := WrapPCMAsWAV(make([]byte, 48000), 1<<40, 1<<20, 7)
+	require.True(t, IsWAV(w))
+	assert.InDelta(t, 1.0, WAVSeconds(w), 1e-9, "out-of-range values fall back to 24 kHz mono 16-bit")
+}

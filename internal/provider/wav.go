@@ -10,11 +10,16 @@ import (
 // WrapPCMAsWAV prepends a canonical 44-byte RIFF/WAVE header to headerless
 // little-endian signed PCM (pure Go, no ffmpeg). bits is normally 16.
 func WrapPCMAsWAV(pcm []byte, sampleRate, channels, bits int) []byte {
-	if channels < 1 {
+	// Values come from the response mime ("audio/L16;rate=24000"); keep them in
+	// the ranges a WAV header can hold and players accept.
+	if channels < 1 || channels > 8 {
 		channels = 1
 	}
-	if bits < 8 {
+	if bits != 8 && bits != 16 && bits != 24 && bits != 32 {
 		bits = 16
+	}
+	if sampleRate < 1 || sampleRate > 384000 {
+		sampleRate = 24000
 	}
 	blockAlign := channels * bits / 8
 	byteRate := sampleRate * blockAlign
