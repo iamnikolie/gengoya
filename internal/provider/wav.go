@@ -101,15 +101,17 @@ func ParsePCMMime(mime string) (rate, channels int) {
 		if len(kv) != 2 {
 			continue
 		}
-		n, err := strconv.Atoi(strings.TrimSpace(kv[1]))
-		if err != nil || n <= 0 {
-			continue
-		}
+		// Bounded parses: these land in uint32/uint16 WAV header fields.
+		v := strings.TrimSpace(kv[1])
 		switch strings.ToLower(strings.TrimSpace(kv[0])) {
 		case "rate":
-			rate = n
+			if n, err := strconv.ParseUint(v, 10, 32); err == nil && n > 0 && n <= 384000 {
+				rate = int(n)
+			}
 		case "channels":
-			channels = n
+			if n, err := strconv.ParseUint(v, 10, 16); err == nil && n > 0 && n <= 8 {
+				channels = int(n)
+			}
 		}
 	}
 	return rate, channels
